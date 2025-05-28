@@ -16,7 +16,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Cvjecara_Latica")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7eb4543464d93e70a221f9e169f332977d834ce3")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+378caa9510b643bd952037d44c98be1e7bbe39d2")]
 [assembly: System.Reflection.AssemblyProductAttribute("Cvjecara_Latica")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Cvjecara_Latica")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
