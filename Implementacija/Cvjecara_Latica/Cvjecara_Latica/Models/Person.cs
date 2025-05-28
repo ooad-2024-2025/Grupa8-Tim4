@@ -11,7 +11,9 @@ namespace Cvjecara_Latica.Models
 
         public string HomeAdress { get; set; }
 
-     public Person()
+        // public string Role { get; set; } pitati asistenticu može li ovo da bi razlikovali kupca i zaposlenika
+
+        public Person()
         {
 
         }

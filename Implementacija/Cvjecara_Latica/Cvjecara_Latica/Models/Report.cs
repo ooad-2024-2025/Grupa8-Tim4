@@ -11,7 +11,7 @@ namespace Cvjecara_Latica.Models
         public DateTime Date { get; set; }
 
         [ForeignKey("Person")]
-        public string EmployeeID { get; set; }
+        public string PersonID { get; set; }
         public Person Person { get; set; }
         public Report()
         {
