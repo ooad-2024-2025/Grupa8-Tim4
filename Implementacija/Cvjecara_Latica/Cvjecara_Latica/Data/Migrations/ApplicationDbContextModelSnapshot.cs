@@ -245,7 +245,7 @@ namespace Cvjecara_Latica.Data.Migrations
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("EmployeeID")
+                    b.Property<string>("PersonID")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
@@ -254,7 +254,7 @@ namespace Cvjecara_Latica.Data.Migrations
 
                     b.HasKey("ReportID");
 
-                    b.HasIndex("EmployeeID");
+                    b.HasIndex("PersonID");
 
                     b.ToTable("Reports", (string)null);
                 });
@@ -570,7 +570,7 @@ namespace Cvjecara_Latica.Data.Migrations
                 {
                     b.HasOne("Cvjecara_Latica.Models.Person", "Person")
                         .WithMany()
-                        .HasForeignKey("EmployeeID")
+                        .HasForeignKey("PersonID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
