@@ -32,6 +32,10 @@ build_property.EnableCodeStyleSeverity =
 build_metadata.AdditionalFiles.TargetPath = QXJlYXNcSWRlbnRpdHlcUGFnZXNcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/nejra/Documents/GitHub/Grupa8-Tim4/Implementacija/Cvjecara_Latica/Cvjecara_Latica/Views/Carts/ConfirmOrder.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2FydHNcQ29uZmlybU9yZGVyLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/nejra/Documents/GitHub/Grupa8-Tim4/Implementacija/Cvjecara_Latica/Cvjecara_Latica/Views/Carts/Create.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2FydHNcQ3JlYXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
@@ -50,6 +54,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/nejra/Documents/GitHub/Grupa8-Tim4/Implementacija/Cvjecara_Latica/Cvjecara_Latica/Views/Carts/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2FydHNcSW5kZXguY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/nejra/Documents/GitHub/Grupa8-Tim4/Implementacija/Cvjecara_Latica/Cvjecara_Latica/Views/Carts/PlaceOrder.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQ2FydHNcUGxhY2VPcmRlci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/nejra/Documents/GitHub/Grupa8-Tim4/Implementacija/Cvjecara_Latica/Cvjecara_Latica/Views/Discounts/Create.cshtml]
@@ -72,12 +80,44 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcRGlzY291bnRzXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/nejra/Documents/GitHub/Grupa8-Tim4/Implementacija/Cvjecara_Latica/Cvjecara_Latica/Views/Home/BestSellers.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxCZXN0U2VsbGVycy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/nejra/Documents/GitHub/Grupa8-Tim4/Implementacija/Cvjecara_Latica/Cvjecara_Latica/Views/Home/FilteredResults.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxGaWx0ZXJlZFJlc3VsdHMuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/nejra/Documents/GitHub/Grupa8-Tim4/Implementacija/Cvjecara_Latica/Cvjecara_Latica/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/nejra/Documents/GitHub/Grupa8-Tim4/Implementacija/Cvjecara_Latica/Cvjecara_Latica/Views/Home/Login.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxMb2dpbi5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/nejra/Documents/GitHub/Grupa8-Tim4/Implementacija/Cvjecara_Latica/Cvjecara_Latica/Views/Home/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/nejra/Documents/GitHub/Grupa8-Tim4/Implementacija/Cvjecara_Latica/Cvjecara_Latica/Views/Home/Register.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxSZWdpc3Rlci5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/nejra/Documents/GitHub/Grupa8-Tim4/Implementacija/Cvjecara_Latica/Cvjecara_Latica/Views/Home/Search.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxTZWFyY2guY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/nejra/Documents/GitHub/Grupa8-Tim4/Implementacija/Cvjecara_Latica/Cvjecara_Latica/Views/Home/SearchResults.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxTZWFyY2hSZXN1bHRzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/nejra/Documents/GitHub/Grupa8-Tim4/Implementacija/Cvjecara_Latica/Cvjecara_Latica/Views/Home/VerificationSuccess.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxWZXJpZmljYXRpb25TdWNjZXNzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/nejra/Documents/GitHub/Grupa8-Tim4/Implementacija/Cvjecara_Latica/Cvjecara_Latica/Views/Home/VerifyCode.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxWZXJpZnlDb2RlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/nejra/Documents/GitHub/Grupa8-Tim4/Implementacija/Cvjecara_Latica/Cvjecara_Latica/Views/Orders/Create.cshtml]

@@ -1,0 +1,57 @@
+﻿@{
+    ViewData["Title"] = "Verify Code";
+}
+
+<h2 style="color: #7a1c1c;">Please enter the verification code we sent to your email.</h2>
+
+<!-- Forma za unos koda -->
+<form asp-action="VerifyCode" method="post" style="margin-bottom: 15px;">
+    <input type="text" name="code" placeholder="Enter code" required
+           style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 5px;" />
+    <button type="submit" id="verifyBtn"
+            style="padding: 10px 20px; background-color: #7a1c1c; color: white; border: none; border-radius: 4px; cursor: pointer;">
+        Verify
+    </button>
+</form>
+
+<!-- Poruke -->
+@if (!string.IsNullOrEmpty(ViewBag.Error))
+{
+    <p style="color: #7a1c1c; font-weight: bold;">@ViewBag.Error</p>
+}
+
+@if (TempData["ResentMessage"] != null)
+{
+    <p style="color: #7a1c1c;">@TempData["ResentMessage"]</p>
+}
+
+<!-- Dugme za ponovno slanje koda -->
+<form asp-action="ResendCode" method="post" style="margin-top: 10px;">
+    <button type="submit" style="background: none; border: none; color: #7a1c1c; text-decoration: underline; cursor: pointer; padding: 0;">
+        Send new code again
+    </button>
+</form>
+
+<!-- Tajmer -->
+<p id="timer" style="color: #7a1c1c; font-weight: bold; margin-top: 10px;"></p>
+
+<script>
+    let seconds = 120;
+    const timerElement = document.getElementById("timer");
+    const verifyButton = document.getElementById("verifyBtn");
+
+    const countdown = setInterval(() => {
+        const minutes = Math.floor(seconds / 60);
+        const secs = seconds % 60;
+        timerElement.innerText = `Code expires in: ${minutes}:${secs < 10 ? '0' + secs : secs}`;
+        seconds--;
+
+        if (seconds < 0) {
+            clearInterval(countdown);
+            timerElement.innerText = 'Code has expired. Click "Send new code again" to get a new one.';
+            verifyButton.disabled = true;
+            verifyButton.style.backgroundColor = "#ccc";
+            verifyButton.style.cursor = "not-allowed";
+        }
+    }, 1000);
+</script>

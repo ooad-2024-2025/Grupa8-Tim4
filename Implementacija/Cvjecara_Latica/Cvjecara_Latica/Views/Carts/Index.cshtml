@@ -1,10 +1,11 @@
 ﻿@model IEnumerable<Cvjecara_Latica.Models.Cart>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Shopping Cart";
+    var total = Model.Sum(item => item.Product.Price * (item.ProductQuantity ?? 1));
 }
 
-<h1>Index</h1>
+<!--<h1>Index</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -25,7 +26,8 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+        -->
+<!--@foreach (var item in Model) {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Product.ProductID)
@@ -45,3 +47,33 @@
 }
     </tbody>
 </table>
+-->
+
+
+<a asp-controller="Home" asp-action="Search" class="btn btn-light">← Back to Shop</a>
+
+<h2 style="color:#7a1c1c;">Your Cart [@Model.Sum(item => item.ProductQuantity ?? 1)]</h2>
+@foreach (var item in Model)
+{
+    <div style="display: flex; align-items: center; margin-bottom: 20px;">
+        <img src="@item.Product.ImageUrl" style="height: 150px; margin-right: 20px;" />
+        <div style="flex-grow: 1;">
+            <h4 style="color: #7a1c1c;">@item.Product.Name</h4>
+            <p style="color: #7a1c1c;">@item.Product.Price BAM</p>
+            <p style="color: #7a1c1c;">Quantity: @item.ProductQuantity</p>
+        </div>
+            <form asp-action="Delete" asp-route-id="@item.CartID" method="post">
+            <button type="submit" class="btn btn-secondary">Delete Product</button>
+        </form>
+    </div>
+}
+
+<div style="margin-top: 20px;">
+    <strong style="color:#7a1c1c;">Total:</strong>
+    <span style="color:#7a1c1c;">@total BAM</span>
+</div>
+
+@if (Model.Any())
+{
+    <a asp-action="PlaceOrder" class="btn btn-danger mt-3">Place Order</a>
+}

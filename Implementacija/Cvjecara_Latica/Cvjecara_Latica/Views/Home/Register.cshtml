@@ -1,0 +1,78 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+@{
+    ViewData["Title"] = "Sign in";
+}
+
+<!--<div class="register-wrapper">
+    <h2>Register</h2>
+
+    <form>
+        <label>First name:</label>
+        <input type="text" placeholder="Enter your first name" />
+
+        <label>Last name:</label>
+        <input type="text" placeholder="Enter your last name" />
+
+        <label>Username:</label>
+        <input type="text" placeholder="Choose a username" />
+
+        <label>Email:</label>
+        <input type="email" placeholder="Enter your email" />
+
+        <label>Phone number:</label>
+        <input type="text" placeholder="Enter your phone number" />
+
+        <label>Password:</label>
+        <input type="password" placeholder="Password (min 8 characters)" />
+
+        <label>Confirm password:</label>
+        <input type="password" placeholder="Repeat your password" />
+
+        <button type="submit">Register</button>
+    </form>
+   
+    
+
+</div> staro -->
+@model Cvjecara_Latica.Models.Register
+<div class="register-wrapper">
+    <h2>Sign in</h2>
+
+    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+    <form asp-action="Register" method="post">
+        <label asp-for="FirstName"></label>
+        <input asp-for="FirstName" class="form-control" />
+        <span asp-validation-for="FirstName" class="text-danger"></span>
+
+        <label asp-for="LastName"></label>
+        <input asp-for="LastName" class="form-control" />
+        <span asp-validation-for="LastName" class="text-danger"></span>
+
+        <label asp-for="HomeAdress"></label>
+        <input asp-for="HomeAdress" class="form-control" />
+        <span asp-validation-for="HomeAdress" class="text-danger"></span>
+
+        <label asp-for="Email"></label>
+        <input asp-for="Email" type="email" class="form-control" />
+        <span asp-validation-for="Email" class="text-danger"></span>
+
+        <label asp-for="PhoneNumber"></label>
+        <input asp-for="PhoneNumber" class="form-control" />
+        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+
+        <label asp-for="Password"></label>
+        <input asp-for="Password" type="password" class="form-control" />
+        <span asp-validation-for="Password" class="text-danger"></span>
+
+        <label asp-for="ConfirmPassword"></label>
+        <input asp-for="ConfirmPassword" type="password" class="form-control" />
+        <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+
+        <button type="submit">Register</button>
+    </form>
+</div>

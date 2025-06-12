@@ -1,0 +1,37 @@
+﻿@{
+    ViewData["Title"] = "Confirm Order";
+}
+
+<h2 style="color:#7a1c1c;">Confirm Your Order</h2>
+
+<p><strong>Name:</strong> @ViewBag.Name</p>
+<p><strong>City:</strong> @ViewBag.City</p>
+<p><strong>Address:</strong> @ViewBag.Address</p>
+<p><strong>Phone:</strong> @ViewBag.Phone</p>
+
+<h4>Total:</h4>
+@if (ViewBag.DiscountedTotal != null && ViewBag.DiscountedTotal < ViewBag.Total)
+{
+    <span style="text-decoration:line-through; color:gray;">@($"{ViewBag.Total} BAM")</span>
+    <span style="color:green; font-weight:bold; margin-left:10px;">@($"{ViewBag.DiscountedTotal} BAM")</span>
+}
+else
+{
+    <span>@($"{ViewBag.Total} BAM")</span>
+}
+
+<hr />
+
+<form asp-action="SubmitOrderFinal" method="post">
+    <input type="hidden" name="name" value="@ViewBag.Name" />
+    <input type="hidden" name="city" value="@ViewBag.City" />
+    <input type="hidden" name="address" value="@ViewBag.Address" />
+    <input type="hidden" name="phone" value="@ViewBag.Phone" />
+    <input type="hidden" name="total" value="@ViewBag.Total" />
+    <input type="hidden" name="discountedTotal" value="@ViewBag.DiscountedTotal" />
+
+    <label><input type="radio" name="paymentMethod" value="Card" checked /> Pay by Card</label><br />
+    <label><input type="radio" name="paymentMethod" value="Delivery" /> Pay on Delivery</label><br /><br />
+
+    <button type="submit" class="btn btn-success">Finish Order</button>
+</form>

@@ -16,6 +16,8 @@ namespace Cvjecara_Latica.Models
         public int ProductID { get; set; }
         public Product Product { get; set; }
 
+        [Required(ErrorMessage = "Product quantity is required.")]
+        [Range(1, 100, ErrorMessage = "Quantity must be between 1 and 100.")]
         public int? ProductQuantity { get; set; }
 
         public ProductOrder()

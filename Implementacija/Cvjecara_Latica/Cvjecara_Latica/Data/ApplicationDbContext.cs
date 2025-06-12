@@ -4,7 +4,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Cvjecara_Latica.Data
 {
-    public class ApplicationDbContext : IdentityDbContext
+    //public class ApplicationDbContext : IdentityDbContext staro
+    public class ApplicationDbContext : IdentityDbContext<Person>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)

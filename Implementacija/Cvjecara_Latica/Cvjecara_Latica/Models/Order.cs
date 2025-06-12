@@ -19,7 +19,12 @@ namespace Cvjecara_Latica.Models
         public DateTime purchaseDate { get; set; }
 
         public bool IsOrderSent { get; set; }
+
+        [Range(0.0, 5.0, ErrorMessage = "Rating must be between 0 and 5.")]
         public double? Rating { get; set; }
+
+        [Required(ErrorMessage = "Total amount is required.")]
+        [Range(0.01, 10000.00, ErrorMessage = "Total amount must be between 0.01 and 10,000.")]
         public double TotalAmountToPay { get; set; } 
 
         [DisplayName("Delivery date")]

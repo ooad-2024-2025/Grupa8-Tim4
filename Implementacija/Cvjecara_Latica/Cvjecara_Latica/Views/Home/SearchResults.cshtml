@@ -1,0 +1,72 @@
+﻿@model List<Cvjecara_Latica.Models.Product>
+
+@{
+    ViewData["Title"] = "Search Results";
+}
+@{
+    var categoryDisplayNames = new Dictionary<string, string>
+    {
+        { "rosebox", "Rose Box" },
+        { "birthdays", "Birthdays" },
+        { "womensday", "Women's Day" },
+        { "valentine", "Valentine's Day" },
+        { "weddings", "Weddings" },
+        { "8thmarch", "8th March" } 
+    };
+
+  string categoryKey = ViewBag.Category?.ToString()?.ToLower();
+  string displayedCategory = !string.IsNullOrEmpty(categoryKey) && categoryDisplayNames.ContainsKey(categoryKey)
+    ? categoryDisplayNames[categoryKey]
+    : ViewBag.Category;
+}
+
+
+<h2 style="color: #7a1c1c;">Search Results</h2>
+
+@if (!string.IsNullOrEmpty(ViewBag.Query) || ViewBag.FlowerTypes != null || ViewBag.Colors != null ||
+     !string.IsNullOrEmpty(ViewBag.Category) || !string.IsNullOrEmpty(ViewBag.Price))
+{
+    <ul style="color: #7a1c1c;">
+        @if (!string.IsNullOrEmpty(ViewBag.Query))
+        {
+            <li><strong>Search query:</strong> @ViewBag.Query</li>
+        }
+        @if (ViewBag.FlowerTypes is List<string> flowerTypes && flowerTypes.Any())
+        {
+            <li><strong>Flower types:</strong> @string.Join(", ", flowerTypes)</li>
+        }
+        @if (ViewBag.Colors is List<string> colors && colors.Any())
+        {
+            <li><strong>Colors:</strong> @string.Join(", ", colors)</li>
+        }
+
+        @if (!string.IsNullOrEmpty(ViewBag.Category))
+        {
+            <li><strong>Category:</strong> @displayedCategory</li>
+        }
+        @if (!string.IsNullOrEmpty(ViewBag.Price))
+        {
+            <li><strong>Price:</strong> @ViewBag.Price</li>
+        }
+    </ul>
+}
+
+@if (Model.Any())
+{
+    <div class="product-grid">
+        @foreach (var product in Model)
+        {
+            <div class="product-card">
+                <a asp-controller="Products" asp-action="Details" asp-route-id="@product.ProductID" style="text-decoration: none;">
+                    <img src="@product.ImageUrl" alt="@product.Name" />
+                    <h3 style="color: #7a1c1c">@product.Name</h3>
+                </a>
+                <p style="color: #7a1c1c">@product.Price BAM</p>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p style="color: red;">No products match your search criteria.</p>
+}

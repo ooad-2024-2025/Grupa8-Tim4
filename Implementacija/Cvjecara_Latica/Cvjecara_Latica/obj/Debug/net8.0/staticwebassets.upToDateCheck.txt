@@ -1,5 +1,11 @@
 wwwroot\css\site.css
 wwwroot\favicon.ico
+wwwroot\images\rosebox1.jpg
+wwwroot\images\rosebox2.jpg
+wwwroot\images\rosebox3.jpg
+wwwroot\images\yellowTulipans.jpg
+wwwroot\images\yellowTulipans2.jpg
+wwwroot\images\yellowTulipans3.jpg
 wwwroot\js\site.js
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css
 wwwroot\lib\bootstrap\dist\css\bootstrap-grid.css.map
@@ -58,3 +64,5 @@ wwwroot\lib\jquery\dist\jquery.js
 wwwroot\lib\jquery\dist\jquery.min.js
 wwwroot\lib\jquery\dist\jquery.min.map
 wwwroot\lib\jquery\LICENSE.txt
+wwwroot\logo.jpg
+wwwroot\viber_slika_2025-05-06_17-09-07-534.jpg

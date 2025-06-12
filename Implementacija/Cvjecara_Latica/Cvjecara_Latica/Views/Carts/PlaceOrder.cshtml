@@ -1,0 +1,78 @@
+﻿@{
+    ViewData["Title"] = "Place Order";
+}
+
+<div style="display: flex; justify-content: space-between; padding: 30px;">
+  <!--  <!-- Način plaćanja -->
+    <div style="flex: 1; padding: 20px;">
+
+
+        <!-- <h3 style="color: #7a1c1c;">Choose Payment Method:</h3> -->
+        <h4 style="color:#7a1c1c; margin-top: 10px;">
+            @if (ViewBag.DiscountedTotal != null && ViewBag.DiscountedTotal < ViewBag.Total)
+            {
+                <span style="text-decoration:line-through; color:gray;">@($"{ViewBag.Total} BAM")</span>
+                <span style="color:#7a1c1c; font-weight:bold; margin-left:10px;">@($"{ViewBag.DiscountedTotal:F2} BAM")</span>
+            }
+            else
+            {
+                <span><strong>Total:</strong> @($"{ViewBag.Total:F2} BAM")</span>
+            }
+        </h4>
+
+
+
+    <!-- Podaci za dostavu -->
+    <div style="flex: 1; padding: 20px;">
+        <h3 style="background-color: white; color: #7a1c1c; padding: 10px; text-align: center;">Delivery Information</h3>
+            <form asp-controller="Carts" asp-action="SubmitOrder" method="post">
+
+            <!-- Name: samo slova, bez brojeva i specijalnih znakova -->
+            <input class="form-control mb-2" placeholder="Name" name="name"
+                   maxlength="50" minlength="2" required
+                   pattern="^[A-Za-zČčĆćŽžĐđŠš\s]+$"
+                   title="Name can only contain letters." />
+
+            <!-- Discount Code: enter + apply -->
+            <div style="display: flex; align-items: flex-start; gap: 10px; margin-bottom: 15px;">
+                <input class="form-control" name="discount"
+                       placeholder="Enter discount code"
+                       value="@(ViewBag.AppliedCode ?? "")"
+                       style="flex: 1; max-width: 300px;" />
+                <button type="submit"
+                        style="background-color: #7a1c1c; color: white; border: none; padding: 6px 12px; border-radius: 4px;"
+                        name="applyDiscount" value="true">
+                    Apply
+                </button>
+            </div>
+
+
+                @if (ViewBag.Error != null)
+                {
+                    <div class="alert alert-danger">@ViewBag.Error</div>
+                }
+
+
+
+            <!-- City: samo slova -->
+            <input class="form-control mb-2" placeholder="City" name="city"
+                   maxlength="40" required
+                   pattern="^[A-Za-zČčĆćŽžĐđŠš\s]+$"
+                   title="City can only contain letters." />
+
+            <!-- Address: slova, brojevi, razmaci i tačka -->
+            <input class="form-control mb-2" placeholder="Address And Postal Number" name="address"
+                   maxlength="100" required
+                   pattern="^[A-Za-z0-9ČčĆćŽžĐđŠš\s\.]+$"
+                   title="Address can contain letters, numbers, and periods." />
+
+            <!-- Phone: samo brojevi -->
+            <input class="form-control mb-2" placeholder="Phone Number" name="phone"
+                   maxlength="15" required
+                   pattern="^[0-9]{7,15}$"
+                   title="Phone number must be between 7 and 15 digits." />
+
+            <button type="submit" class="btn btn-danger w-100 mt-3">Complete Order</button>
+        </form>
+    </div>
+</div>

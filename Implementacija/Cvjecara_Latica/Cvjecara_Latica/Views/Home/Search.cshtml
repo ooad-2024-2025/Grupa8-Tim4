@@ -1,0 +1,79 @@
+﻿@{
+    ViewData["Title"] = "Search";
+}
+
+<div class="search-page">
+    <form method="get" asp-action="SearchResults">
+        <div class="search-bar">
+            <input type="text" name="query" placeholder="Search by flower type or color" />
+            <button type="submit"><i class="fas fa-search"></i></button>
+        </div>
+
+        <!-- Dugme ispod search bara -->
+        <div class="show-all-wrapper">
+            <a asp-controller="Home" asp-action="SearchResults" class="btn btn-outline-danger">
+                Show all products
+            </a>
+        </div>
+
+
+        <h3><b>Filters</b></h3>
+
+        <div class="filter-row">
+            <strong>Flower types:</strong><br />
+            <label><input type="checkbox" name="flowerTypes" value="roses" /> Roses</label>
+            <label><input type="checkbox" name="flowerTypes" value="tulips" /> Tulips</label>
+            <label><input type="checkbox" name="flowerTypes" value="sunflowers" /> Sunflowers</label>
+            <label><input type="checkbox" name="flowerTypes" value="carnations" /> Carnations</label>
+            <label><input type="checkbox" name="flowerTypes" value="lilies" /> Lilies</label>
+        </div>
+
+        <div class="filter-row">
+            <strong>Colors:</strong><br />
+            <label><input type="checkbox" name="colors" value="red" /> Red</label>
+            <label><input type="checkbox" name="colors" value="yellow" /> Yellow</label>
+            <label><input type="checkbox" name="colors" value="purple" /> Purple</label>
+            <label><input type="checkbox" name="colors" value="white" /> White</label>
+            <label><input type="checkbox" name="colors" value="pink" /> Pink</label>
+        </div>
+
+        <div class="filter-row">
+            <strong>Category:</strong><br />
+            <label><input type="radio" name="category" value="rosebox" /> Rose box</label>
+            <label><input type="radio" name="category" value="birthdays" /> Birthdays</label>
+            <label><input type="radio" name="category" value="womensday" /> 8th March</label>
+            <label><input type="radio" name="category" value="valentine" /> Valentine</label>
+            <label><input type="radio" name="category" value="weddings" /> Weddings</label>
+        </div>
+
+        <div class="filter-row">
+            <strong>Price:</strong><br />
+            <label><input type="radio" name="price" value="5-20" /> 5 - 20 BAM</label>
+            <label><input type="radio" name="price" value="20-50" /> 20 - 50 BAM</label>
+            <label><input type="radio" name="price" value="50-100" /> 50 - 100 BAM</label>
+            <label><input type="radio" name="price" value="200" /> 200 BAM</label>
+            <label><input type="radio" name="price" value="800" /> 800 BAM</label>
+        </div>
+
+        <button type="submit">Search</button>
+    </form>
+</div>
+
+<script>
+    const form = document.querySelector("form");
+
+    @*// Automatski submit kada se klikne checkbox ili radio dugme
+    document.querySelectorAll("input[type=checkbox], input[type=radio]").forEach(input => {
+        input.addEventListener("change", () => {
+            form.submit();
+        });
+    });*@
+
+    // Opcionalno: automatski submit ako korisnik pritisne Enter u tekst polju
+    const searchInput = document.querySelector("input[name='query']");
+    searchInput.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+            form.submit();
+        }
+    });
+</script> 

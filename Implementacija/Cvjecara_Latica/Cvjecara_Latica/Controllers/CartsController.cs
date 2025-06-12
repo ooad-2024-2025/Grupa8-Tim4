@@ -22,9 +22,23 @@ namespace Cvjecara_Latica.Controllers
         // GET: Carts
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Cart.Include(c => c.Person).Include(c => c.Product);
-            return View(await applicationDbContext.ToListAsync());
+          //  var applicationDbContext = _context.Cart.Include(c => c.Person).Include(c => c.Product);
+          // return View(await applicationDbContext.ToListAsync());
+         
+        
+            var userId = User.Identity.IsAuthenticated
+                ? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value
+                : "anonimni";
+
+            var cartItems = _context.Cart
+                .Include(c => c.Product) // samo ovo treba
+                .Where(c => c.PersonID == userId) // filter po korisniku
+                .ToList();
+
+            return View(cartItems);
         }
+
+        
 
         // GET: Carts/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -150,15 +164,17 @@ namespace Cvjecara_Latica.Controllers
         // POST: Carts/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
+        [HttpPost]
+       
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var cart = await _context.Cart.FindAsync(id);
-            if (cart != null)
+            var cartItem = await _context.Cart.FindAsync(id);
+            if (cartItem != null)
             {
-                _context.Cart.Remove(cart);
+                _context.Cart.Remove(cartItem);
+                await _context.SaveChangesAsync();
             }
 
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
@@ -166,5 +182,192 @@ namespace Cvjecara_Latica.Controllers
         {
             return _context.Cart.Any(e => e.CartID == id);
         }
+        [HttpPost]
+        public IActionResult AddToCart(int productId)
+        {
+            // Provjeri da li proizvod postoji
+            var product = _context.Products.FirstOrDefault(p => p.ProductID == productId);
+            if (product == null)
+                return NotFound();
+
+            // Ako koristiš autentifikaciju — dohvaća se ID prijavljenog korisnika
+            var userId = User.Identity.IsAuthenticated
+                ? User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier).Value
+                : "anonimni"; // zamijeni ako ne koristiš korisnike
+
+            // Provjeri postoji li već isti proizvod u korpi korisnika
+            var existingCartItem = _context.Cart
+                .FirstOrDefault(c => c.ProductID == productId && c.PersonID == userId);
+
+            if (existingCartItem != null)
+            {
+                existingCartItem.ProductQuantity = (existingCartItem.ProductQuantity ?? 1) + 1;
+            }
+            else
+            {
+                var cartItem = new Cart
+                {
+                    ProductID = productId,
+                    PersonID = userId,
+                    ProductQuantity = 1
+                };
+                _context.Cart.Add(cartItem);
+            }
+
+            _context.SaveChanges();
+
+            // Vrati korisnika nazad na stranicu proizvoda
+            return RedirectToAction("Details", "Products", new { id = productId });
+        }
+        [HttpGet]
+        public IActionResult PlaceOrder()
+        {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            var cartItems = _context.Cart
+                .Include(c => c.Product)
+                .Where(c => c.PersonID == userId)
+                .ToList();
+
+            double total = cartItems.Sum(item => item.Product.Price * (item.ProductQuantity ?? 1));
+            ViewBag.Total = total;
+
+            // Spremi kodove popusta korisnika (ako je registriran)
+            var discounts = _context.Discounts
+                .Where(d => d.PersonID == userId && !d.IsUsed && d.DiscountBegins <= DateTime.Now)
+                .ToList();
+
+            ViewBag.Discounts = discounts;
+
+            return View();
+        }
+
+        // POST: Carts/SubmitOrder
+        [HttpPost]
+        public async Task<IActionResult> SubmitOrder(string name, string discount, string city, string address, string phone, string applyDiscount)
+        {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            var cartItems = _context.Cart.Include(c => c.Product).Where(c => c.PersonID == userId).ToList();
+
+            double total = cartItems.Sum(item => item.Product.Price * (item.ProductQuantity ?? 1));
+            double originalTotal = total;
+            double discountedTotal = total;
+
+            // Ako je kliknuto "Apply" za popust kod
+            if (!string.IsNullOrEmpty(applyDiscount))
+            {
+                if (!string.IsNullOrEmpty(discount))
+                {
+                    var validDiscount = _context.Discounts
+                        .FirstOrDefault(d => d.DiscountCode == discount && d.PersonID == userId && !d.IsUsed && d.DiscountBegins <= DateTime.Now);
+
+                    if (validDiscount != null)
+                    {
+                        if (validDiscount.DiscountType == DiscountType.PercentageOff)
+                            discountedTotal = total - (total * validDiscount.DiscountAmount / 100);
+                        else if (validDiscount.DiscountType == DiscountType.AmountOff)
+                            discountedTotal = total - validDiscount.DiscountAmount;
+
+                        // Ažuriraj popust kod u ViewBag za prikaz na stranici
+                        ViewBag.AppliedCode = discount;
+                        ViewBag.DiscountedTotal = discountedTotal;
+
+                        // Označi popust kao iskorišten
+                        validDiscount.IsUsed = true;
+                        _context.Discounts.Update(validDiscount);
+                        await _context.SaveChangesAsync();
+                    }
+                    else
+                    {
+                        ViewBag.Error = "Invalid or expired discount code.";
+                    }
+                }
+            }
+
+            // Pošaljite korisniku na potvrdu narudžbe s novim informacijama
+            ViewBag.Total = originalTotal;
+            ViewBag.Name = name;
+            ViewBag.City = city;
+            ViewBag.Address = address;
+            ViewBag.Phone = phone;
+
+            // Ispisujemo ukupnu cijenu (s popustom ili bez njega)
+            ViewBag.DiscountedTotal = discountedTotal;
+
+            // Prikazivanje stranice za potvrdu narudžbe
+            return View("ConfirmOrder");
+        }
+
+        // GET: Carts/ConfirmOrder
+        public IActionResult ConfirmOrder(string name, string discount, string city, string address, string phone)
+        {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            var cartItems = _context.Cart
+                .Include(c => c.Product)
+                .Where(c => c.PersonID == userId)
+                .ToList();
+
+            double total = cartItems.Sum(item => item.Product.Price * (item.ProductQuantity ?? 1));
+            double discountedTotal = total;
+
+            // Ako je popust kod uneseno na stranici za potvrdu
+            if (!string.IsNullOrEmpty(discount))
+            {
+                var discountEntity = _context.Discounts
+                    .FirstOrDefault(d =>
+                        d.DiscountCode == discount &&
+                        d.DiscountBegins <= DateTime.Now &&
+                        !d.IsUsed &&
+                        d.PersonID == userId);
+
+                if (discountEntity != null && discountEntity.DiscountAmount > 0)
+                {
+                    // Primijeni popust
+                    discountedTotal = discountEntity.DiscountType == DiscountType.PercentageOff
+                        ? total - (total * discountEntity.DiscountAmount / 100)
+                        : total - discountEntity.DiscountAmount;
+
+                    // Označi popust kao iskorišten
+                    discountEntity.IsUsed = true;
+                    _context.SaveChanges();
+
+                    // Postavi info za prikaz
+                    ViewBag.AppliedCode = discount;
+                    ViewBag.Total = total;
+                    ViewBag.DiscountedTotal = discountedTotal;
+                    ViewBag.Name = name;
+                    ViewBag.City = city;
+                    ViewBag.Address = address;
+                    ViewBag.Phone = phone;
+
+                    return View("ConfirmOrder");
+                }
+                else
+                {
+                    ViewBag.Error = "The discount code is invalid or already used.";
+                    ViewBag.Total = total;
+                    ViewBag.Name = name;
+                    ViewBag.City = city;
+                    ViewBag.Address = address;
+                    ViewBag.Phone = phone;
+
+                    return View("PlaceOrder");
+                }
+            }
+
+            // Ako nema koda uopšte
+            ViewBag.Total = total;
+            ViewBag.DiscountedTotal = discountedTotal;
+            ViewBag.Name = name;
+            ViewBag.City = city;
+            ViewBag.Address = address;
+            ViewBag.Phone = phone;
+
+            return View("ConfirmOrder");
+        }
+
+
+
     }
+
 }

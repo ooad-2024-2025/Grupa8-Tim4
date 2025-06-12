@@ -1,8 +1,25 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Welcome";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="main-wrapper">
+    <div class="content-section">
+        <div class="logo-text">
+            <img src="/logo.jpg" alt="Latica Logo" class="logo-image" />
+            <h1 class="welcome-title">Welcome!</h1>
+            <div class="description-box">
+                <p>
+                    'Latica' is a flower shop where flowers tell the most beautiful stories.
+                    Here you will find bouquets for every special and meaningful moment in life.
+                    Flowers that smell like love, joy, happiness, and beautiful memories.
+                    Whether you want to bring a smile, say "I love you", or simply brighten someone's day —
+                    every petal has its own story at our place.
+                </p>
+            </div>
+        </div>
+        <div class="flower-section">
+            <img src="/viber_slika_2025-05-06_17-09-07-534.jpg" alt="Bouquet" class="flower-image" />
+            <a asp-controller="Home" asp-action="BestSellers" class="best-sellers-button" style="color: #7a1c1c; text-decoration: none;">Best sellers →</a>
+        </div>
+    </div>
 </div>

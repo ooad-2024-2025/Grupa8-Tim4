@@ -1,0 +1,24 @@
+﻿@model List<Cvjecara_Latica.Models.Product>
+
+@{
+    ViewData["Title"] = "Best Sellers";
+}
+
+<h2 style="color: #7a1c1c">Best Sellers</h2>
+<p style="color: #7a1c1c; font-size: 18px; margin-bottom: 20px;">
+    The most wanted stories in one place.
+</p>
+
+<div class="product-grid">
+    @foreach (var product in Model)
+    {
+        <div class="product-card">
+            <a asp-controller="Products" asp-action="Details" asp-route-id="@product.ProductID" style="text-decoration: none;">
+                <img src="@product.ImageUrl" alt="@product.Name" />
+                <h3 style="color: #7a1c1c">@product.Name</h3>
+                <p style="color: #7a1c1c">@product.Price BAM</p>
+            </a>
+        </div>
+    }
+</div>
+
