@@ -133,7 +133,6 @@ C:\Users\nejra\Documents\GitHub\Grupa8-Tim4\Implementacija\Cvjecara_Latica\Cvjec
 C:\Users\nejra\Documents\GitHub\Grupa8-Tim4\Implementacija\Cvjecara_Latica\Cvjecara_Latica\obj\Debug\net8.0\staticwebassets.build.json.cache
 C:\Users\nejra\Documents\GitHub\Grupa8-Tim4\Implementacija\Cvjecara_Latica\Cvjecara_Latica\obj\Debug\net8.0\staticwebassets.development.json
 C:\Users\nejra\Documents\GitHub\Grupa8-Tim4\Implementacija\Cvjecara_Latica\Cvjecara_Latica\obj\Debug\net8.0\staticwebassets.build.endpoints.json
-C:\Users\nejra\Documents\GitHub\Grupa8-Tim4\Implementacija\Cvjecara_Latica\Cvjecara_Latica\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 C:\Users\nejra\Documents\GitHub\Grupa8-Tim4\Implementacija\Cvjecara_Latica\Cvjecara_Latica\obj\Debug\net8.0\Cvjecara.7835429C.Up2Date
 C:\Users\nejra\Documents\GitHub\Grupa8-Tim4\Implementacija\Cvjecara_Latica\Cvjecara_Latica\obj\Debug\net8.0\Cvjecara_Latica.dll
 C:\Users\nejra\Documents\GitHub\Grupa8-Tim4\Implementacija\Cvjecara_Latica\Cvjecara_Latica\obj\Debug\net8.0\refint\Cvjecara_Latica.dll
