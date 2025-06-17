@@ -1,15 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Cvjecara_Latica.Data;
+using Cvjecara_Latica.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Cvjecara_Latica.Data;
-using Cvjecara_Latica.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Cvjecara_Latica.Controllers
 {
+    [Authorize(Roles = "Administrator")]
     public class DiscountsController : Controller
     {
         private readonly ApplicationDbContext _context;

@@ -5,28 +5,7 @@
     var total = Model.Sum(item => item.Product.Price * (item.ProductQuantity ?? 1));
 }
 
-<!--<h1>Index</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Product)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Person)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ProductQuantity)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        -->
 <!--@foreach (var item in Model) {
         <tr>
             <td>
@@ -59,18 +38,19 @@
         <img src="@item.Product.ImageUrl" style="height: 150px; margin-right: 20px;" />
         <div style="flex-grow: 1;">
             <h4 style="color: #7a1c1c;">@item.Product.Name</h4>
-            <p style="color: #7a1c1c;">@item.Product.Price BAM</p>
+            <p style="color: #7a1c1c;">@item.Product.Price USD</p>
             <p style="color: #7a1c1c;">Quantity: @item.ProductQuantity</p>
         </div>
             <form asp-action="Delete" asp-route-id="@item.CartID" method="post">
             <button type="submit" class="btn btn-secondary">Delete Product</button>
         </form>
+
     </div>
 }
 
 <div style="margin-top: 20px;">
     <strong style="color:#7a1c1c;">Total:</strong>
-    <span style="color:#7a1c1c;">@total BAM</span>
+    <span style="color:#7a1c1c;">@total USD</span>
 </div>
 
 @if (Model.Any())

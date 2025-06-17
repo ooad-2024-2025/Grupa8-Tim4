@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Cvjecara_Latica.Data;
+using Cvjecara_Latica.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Cvjecara_Latica.Data;
-using Cvjecara_Latica.Models;
+using System.Security.Claims;
+
 
 namespace Cvjecara_Latica.Controllers
 {
+    [Authorize]
     public class OrdersController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -18,15 +18,33 @@ namespace Cvjecara_Latica.Controllers
         {
             _context = context;
         }
+      
 
         // GET: Orders
+        /* public async Task<IActionResult> Index()
+         {
+             var applicationDbContext = _context.Orders.Include(o => o.Payment).Include(o => o.Person);
+             return View(await applicationDbContext.ToListAsync());
+         }
+        */
+
         public async Task<IActionResult> Index()
         {
-            var applicationDbContext = _context.Orders.Include(o => o.Payment).Include(o => o.Person);
-            return View(await applicationDbContext.ToListAsync());
+            IQueryable<Order> orders = _context.Orders
+                .Include(o => o.Payment)
+                .Include(o => o.Person); 
+
+            if (!User.IsInRole("Administrator"))
+            {
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                orders = orders.Where(o => o.PersonID == userId);
+            }
+
+            return View(await orders.ToListAsync());
         }
 
         // GET: Orders/Details/5
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -42,11 +60,13 @@ namespace Cvjecara_Latica.Controllers
             {
                 return NotFound();
             }
+         
 
             return View(order);
         }
 
         // GET: Orders/Create
+        [Authorize(Roles = "Administrator")]
         public IActionResult Create()
         {
             ViewData["PaymentID"] = new SelectList(_context.Payments, "PaymentID", "PaymentID");
@@ -57,9 +77,11 @@ namespace Cvjecara_Latica.Controllers
         // POST: Orders/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
+        [Authorize(Roles = "Administrator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("OrderID,PaymentID,PersonID,purchaseDate,IsOrderSent,Rating,TotalAmountToPay,DeliveryDate")] Order order)
+        public async Task<IActionResult> Create([Bind("OrderID,PaymentID,PersonID,purchaseDate,IsOrderSent,Rating,TotalAmountToPay,DeliveryDate, IsPickedUp")] Order order)
         {
             if (ModelState.IsValid)
             {
@@ -73,6 +95,7 @@ namespace Cvjecara_Latica.Controllers
         }
 
         // GET: Orders/Edit/5
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -93,9 +116,11 @@ namespace Cvjecara_Latica.Controllers
         // POST: Orders/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
+        [Authorize(Roles = "Administrator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("OrderID,PaymentID,PersonID,purchaseDate,IsOrderSent,Rating,TotalAmountToPay,DeliveryDate")] Order order)
+        public async Task<IActionResult> Edit(int id, [Bind("OrderID,PaymentID,PersonID,purchaseDate,IsOrderSent,Rating,TotalAmountToPay,DeliveryDate, IsPickedUp")] Order order)
         {
             if (id != order.OrderID)
             {
@@ -128,6 +153,7 @@ namespace Cvjecara_Latica.Controllers
         }
 
         // GET: Orders/Delete/5
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -148,6 +174,8 @@ namespace Cvjecara_Latica.Controllers
         }
 
         // POST: Orders/Delete/5
+
+        [Authorize(Roles = "Administrator")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
@@ -161,10 +189,24 @@ namespace Cvjecara_Latica.Controllers
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
-
         private bool OrderExists(int id)
         {
             return _context.Orders.Any(e => e.OrderID == id);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Administrator")]
+        public async Task<IActionResult> MarkAsPickedUp(int id)
+        {
+            var order = await _context.Orders.FindAsync(id);
+            if (order == null)
+                return NotFound();
+
+            order.IsPickedUp = true;
+            _context.Orders.Update(order);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Index");
         }
     }
 }

@@ -29,7 +29,8 @@ namespace Cvjecara_Latica.Models
 
         [DisplayName("Delivery date")]
         public DateTime DeliveryDate { get; set; }
-
+        [DisplayName("Picked up")]
+        public bool IsPickedUp { get; set; } = false;
         public Order()
         {
 

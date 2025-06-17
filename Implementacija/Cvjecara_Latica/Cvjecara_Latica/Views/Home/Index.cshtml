@@ -22,4 +22,32 @@
             <a asp-controller="Home" asp-action="BestSellers" class="best-sellers-button" style="color: #7a1c1c; text-decoration: none;">Best sellers →</a>
         </div>
     </div>
-</div>
+</div>@if (User.IsInRole("Administrator"))
+{
+    <a asp-controller="Reports" asp-action="Create" class="floating-report-btn">
+        ➕ Create Report
+    </a>
+}
+<style>
+    .floating-report-btn {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background-color: #7a1c1c;
+        color: white;
+        padding: 12px 20px;
+        border-radius: 30px;
+        font-size: 16px;
+        font-weight: bold;
+        text-decoration: none;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        transition: background-color 0.3s ease;
+    }
+
+        .floating-report-btn:hover {
+            background-color: #a12d2d;
+            text-decoration: none;
+            color: white;
+        }
+</style>

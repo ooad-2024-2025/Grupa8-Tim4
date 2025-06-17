@@ -15,15 +15,20 @@
     </div>
     <div class="info-section">
         <h2>@Model.Name</h2>
-        <h3 class="price">@Model.Price.ToString("0.00") BAM</h3>
+        <h3 class="price">@Model.Price.ToString("0.00") USD</h3>
         <p class="description">@Model.Description</p>
-
         <form asp-controller="Carts" asp-action="AddToCart" method="post">
             <input type="hidden" name="productId" value="@Model.ProductID" />
-            <button type="submit" class="add-to-cart-btn">
+            <button type="submit" class="add-to-cart-btn"
+                    @(User.Identity.IsAuthenticated ? "" : "disabled")>
                 <i class="fa fa-shopping-cart"></i> Add to Cart
             </button>
         </form>
+
+        @if (!User.Identity.IsAuthenticated)
+        {
+            <p class="text-danger mt-2">Please log in to add items to your cart.</p>
+        }
     </div>
 </div>
 

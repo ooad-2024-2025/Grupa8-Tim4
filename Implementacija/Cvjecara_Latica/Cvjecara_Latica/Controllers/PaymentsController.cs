@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Cvjecara_Latica.Data;
 using Cvjecara_Latica.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Cvjecara_Latica.Controllers
 {
+    [Authorize(Roles = "Administrator")]
     public class PaymentsController : Controller
     {
         private readonly ApplicationDbContext _context;

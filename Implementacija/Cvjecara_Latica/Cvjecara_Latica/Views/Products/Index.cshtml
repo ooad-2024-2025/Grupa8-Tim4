@@ -5,10 +5,12 @@
 }
 
 <h1>Index</h1>
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+@if (User.IsInRole("Administrator"))
+{
+    <p>
+        <a asp-action="Create">Create New</a>
+    </p>
+}
 <table class="table">
     <thead>
         <tr>
@@ -67,8 +69,11 @@
                 @Html.DisplayFor(modelItem => item.productType)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.ProductID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ProductID">Details</a> |
+    @if (User.IsInRole("Administrator"))
+    {
+                <a asp-action="Edit" asp-route-id="@item.ProductID">Edit</a> 
+                <a asp-action="Details" asp-route-id="@item.ProductID">Details</a> 
+    }
                 <a asp-action="Delete" asp-route-id="@item.ProductID">Delete</a>
             </td>
         </tr>

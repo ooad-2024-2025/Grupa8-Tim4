@@ -1,37 +1,89 @@
-﻿@{
+﻿@model Cvjecara_Latica.Models.Payment
+
+@{
     ViewData["Title"] = "Confirm Order";
 }
-
+@if (TempData["DiscountMessage"] != null)
+{
+    <div class="alert alert-info">@TempData["DiscountMessage"]</div>
+}
 <h2 style="color:#7a1c1c;">Confirm Your Order</h2>
 
+<!-- ViewBag details -->
 <p><strong>Name:</strong> @ViewBag.Name</p>
 <p><strong>City:</strong> @ViewBag.City</p>
 <p><strong>Address:</strong> @ViewBag.Address</p>
 <p><strong>Phone:</strong> @ViewBag.Phone</p>
-
-<h4>Total:</h4>
-@if (ViewBag.DiscountedTotal != null && ViewBag.DiscountedTotal < ViewBag.Total)
+<p><strong>Delivery Date:</strong> @ViewBag.DeliveryDate?.ToString("dd.MM.yyyy. HH:mm")</p>
+@if (TempData["DiscountApplied"] != null && (bool)TempData["DiscountApplied"] == true)
 {
-    <span style="text-decoration:line-through; color:gray;">@($"{ViewBag.Total} BAM")</span>
-    <span style="color:green; font-weight:bold; margin-left:10px;">@($"{ViewBag.DiscountedTotal} BAM")</span>
+    <h4>Total:</h4>
+    <p>
+        <del style="color: gray;">@($"{TempData["OriginalTotal"]:F2} USD")</del><br />
+        <strong style="color: green;">Discounted Total: @($"{ViewBag.Total:F2} USD")</strong><br />
+        <span style="color: green;">You saved: @($"{TempData["SavedAmount"]:F2} USD")</span>
+    </p>
 }
 else
 {
-    <span>@($"{ViewBag.Total} BAM")</span>
+    <h4>Total:</h4>
+    <span>@($"{ViewBag.Total:F2} USD")</span>
 }
 
 <hr />
 
 <form asp-action="SubmitOrderFinal" method="post">
+    @Html.AntiForgeryToken()
+
+    <!-- Hidden fields -->
     <input type="hidden" name="name" value="@ViewBag.Name" />
     <input type="hidden" name="city" value="@ViewBag.City" />
     <input type="hidden" name="address" value="@ViewBag.Address" />
     <input type="hidden" name="phone" value="@ViewBag.Phone" />
+    <input type="hidden" name="deliveryDate" value="@ViewBag.DeliveryDate.ToString("yyyy-MM-ddTHH:mm")" />
     <input type="hidden" name="total" value="@ViewBag.Total" />
-    <input type="hidden" name="discountedTotal" value="@ViewBag.DiscountedTotal" />
 
-    <label><input type="radio" name="paymentMethod" value="Card" checked /> Pay by Card</label><br />
-    <label><input type="radio" name="paymentMethod" value="Delivery" /> Pay on Delivery</label><br /><br />
+    <div id="card-logo" style="margin-left: 25px; margin-bottom: 20px;">
+        <img src="~/images/mastercard.jpg" alt="Mastercard logo" style="height: 75px;" />
+    </div>
+    <!-- Payment selection -->
+    <div class="form-group payment-options" style="margin-top: 20px;">
+        <label class="payment-option">
+            <input type="radio" name="paymentTypeString" value="Card" checked onchange="toggleCardFields()" />
+            Pay by Card
+        </label>
+        
+        <label class="payment-option">
+            <input type="radio" name="paymentTypeString" value="Delivery" onchange="toggleCardFields()" />
+            Pay on Delivery
+        </label>
+    </div>
 
-    <button type="submit" class="btn btn-success">Finish Order</button>
+    <!-- Card info field -->
+    <div id="card-info" style="display: none;">
+        <div class="form-group">
+            <label asp-for="BankAccount" class="control-label"></label>
+            <input asp-for="BankAccount" class="form-control" />
+            <span asp-validation-for="BankAccount" class="text-danger"></span>
+        </div>
+    </div>
+
+    <br />
+    <button type="submit" class="btn" style="background-color: #e75480; color: white;">
+        Continue
+    </button>
 </form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function toggleCardFields() {
+            const selected = document.querySelector('input[name="paymentTypeString"]:checked').value;
+            const cardInfo = document.getElementById("card-info");
+            cardInfo.style.display = selected === "Card" ? "block" : "none";
+        }
+
+        // Initial run on page load
+        document.addEventListener("DOMContentLoaded", toggleCardFields);
+    </script>
+}

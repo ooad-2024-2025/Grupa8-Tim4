@@ -7,9 +7,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Cvjecara_Latica.Data;
 using Cvjecara_Latica.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
 
 namespace Cvjecara_Latica.Controllers
 {
+    [Authorize]
     public class ProductSalesController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -46,6 +49,7 @@ namespace Cvjecara_Latica.Controllers
         }
 
         // GET: ProductSales/Create
+        [Authorize(Roles="Administrator")]
         public IActionResult Create()
         {
             ViewData["ProductID"] = new SelectList(_context.Products, "ProductID", "ProductID");
@@ -70,6 +74,7 @@ namespace Cvjecara_Latica.Controllers
         }
 
         // GET: ProductSales/Edit/5
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -89,6 +94,7 @@ namespace Cvjecara_Latica.Controllers
         // POST: ProductSales/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Administrator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ProductSalesID,SalesDate,ProductID")] ProductSale productSale)
@@ -123,6 +129,7 @@ namespace Cvjecara_Latica.Controllers
         }
 
         // GET: ProductSales/Delete/5
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -142,6 +149,7 @@ namespace Cvjecara_Latica.Controllers
         }
 
         // POST: ProductSales/Delete/5
+        [Authorize(Roles = "Administrator")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

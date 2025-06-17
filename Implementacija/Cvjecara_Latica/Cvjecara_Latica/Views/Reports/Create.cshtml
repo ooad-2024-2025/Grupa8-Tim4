@@ -11,21 +11,39 @@
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div asp-validation-summary="All" class="text-danger"></div>
+
             <div class="form-group">
                 <label asp-for="ReportType" class="control-label"></label>
-                <select asp-for="ReportType" class="form-control"></select>
+                <select asp-for="ReportType" class="form-control" asp-items="Html.GetEnumSelectList<ReportType>()"></select>
                 <span asp-validation-for="ReportType" class="text-danger"></span>
             </div>
+
             <div class="form-group">
                 <label asp-for="Date" class="control-label"></label>
                 <input asp-for="Date" class="form-control" />
                 <span asp-validation-for="Date" class="text-danger"></span>
             </div>
+
+            <div class="form-group">
+                <label asp-for="Content" class="control-label"></label>
+                <textarea asp-for="Content" class="form-control" rows="4"></textarea>
+                <span asp-validation-for="Content" class="text-danger"></span>
+            </div>
+
             <div class="form-group">
                 <label asp-for="PersonID" class="control-label"></label>
-                <select asp-for="PersonID" class ="form-control" asp-items="ViewBag.PersonID"></select>
+                <select asp-for="PersonID" class="form-control" asp-items="ViewBag.PersonID">
+                    <option value="">-- Select Person --</option>
+                </select>
+                <span asp-validation-for="PersonID" class="text-danger"></span>
             </div>
+
+            <div class="form-group">
+                <label class="control-label">Person Info</label>
+                <input type="text" id="personInfo" class="form-control" readonly />
+            </div>
+
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
@@ -38,5 +56,24 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const personSelect = document.querySelector("select[name='PersonID']");
+            const infoField = document.getElementById("personInfo");
+
+            const personData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(ViewBag.PersonList ?? new Dictionary<string, string>()));
+
+            function updatePersonInfo() {
+                const selectedId = personSelect.value;
+                infoField.value = personData[selectedId] || "";
+            }
+
+            personSelect.addEventListener("change", updatePersonInfo);
+            updatePersonInfo();
+        });
+    </script>
 }

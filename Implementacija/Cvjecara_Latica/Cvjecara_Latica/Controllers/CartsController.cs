@@ -1,22 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Cvjecara_Latica.Data;
+using Cvjecara_Latica.Models;
+using Cvjecara_Latica.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Cvjecara_Latica.Data;
-using Cvjecara_Latica.Models;
+using System.Security.Claims;
+
 
 namespace Cvjecara_Latica.Controllers
 {
+    [Authorize]
     public class CartsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly EmailService _emailService;
 
-        public CartsController(ApplicationDbContext context)
+        public CartsController(ApplicationDbContext context, EmailService emailService)
         {
             _context = context;
+            _emailService = emailService;
         }
 
         // GET: Carts
@@ -38,24 +41,22 @@ namespace Cvjecara_Latica.Controllers
             return View(cartItems);
         }
 
-        
+
 
         // GET: Carts/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var cart = await _context.Cart
-                .Include(c => c.Person)
                 .Include(c => c.Product)
-                .FirstOrDefaultAsync(m => m.CartID == id);
+                .FirstOrDefaultAsync(c => c.CartID == id &&( c.PersonID == userId || User.IsInRole("Administrator")));
+
             if (cart == null)
-            {
-                return NotFound();
-            }
+                return Forbid(); // ili NotFound()
 
             return View(cart);
         }
@@ -90,17 +91,19 @@ namespace Cvjecara_Latica.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
-            var cart = await _context.Cart.FindAsync(id);
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var cart = await _context.Cart
+                .Include(c => c.Product)
+                .FirstOrDefaultAsync(c => c.CartID == id && (c.PersonID == userId || User.IsInRole("Administrator")));
+
             if (cart == null)
-            {
-                return NotFound();
-            }
-            ViewData["PersonID"] = new SelectList(_context.Set<Person>(), "Id", "Id", cart.PersonID);
+                return Forbid(); // ili NotFound()
+
             ViewData["ProductID"] = new SelectList(_context.Products, "ProductID", "ProductID", cart.ProductID);
+            ViewData["PersonID"] = new SelectList(_context.Users, "Id", "Id", cart.PersonID);
             return View(cart);
         }
 
@@ -112,32 +115,26 @@ namespace Cvjecara_Latica.Controllers
         public async Task<IActionResult> Edit(int id, [Bind("CartID,ProductID,PersonID,ProductQuantity")] Cart cart)
         {
             if (id != cart.CartID)
-            {
                 return NotFound();
-            }
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var originalCart = await _context.Cart
+                .FirstOrDefaultAsync(c => c.CartID == id && (c.PersonID == userId) || User.IsInRole("Administrator"));
+
+            if (originalCart == null)
+                return Forbid();
 
             if (ModelState.IsValid)
             {
-                try
-                {
-                    _context.Update(cart);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!CartExists(cart.CartID))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
+                originalCart.ProductQuantity = cart.ProductQuantity;
+                _context.Update(originalCart);
+                await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["PersonID"] = new SelectList(_context.Set<Person>(), "Id", "Id", cart.PersonID);
+
             ViewData["ProductID"] = new SelectList(_context.Products, "ProductID", "ProductID", cart.ProductID);
+            ViewData["PersonID"] = new SelectList(_context.Users, "Id", "Id", cart.PersonID);
             return View(cart);
         }
 
@@ -145,35 +142,35 @@ namespace Cvjecara_Latica.Controllers
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             var cart = await _context.Cart
-                .Include(c => c.Person)
                 .Include(c => c.Product)
-                .FirstOrDefaultAsync(m => m.CartID == id);
+                .FirstOrDefaultAsync(c => c.CartID == id &&( c.PersonID == userId || User.IsInRole("Administrator")));
+
             if (cart == null)
-            {
-                return NotFound();
-            }
+                return Forbid();
 
             return View(cart);
         }
-
+        
         // POST: Carts/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        [HttpPost]
-       
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var cartItem = await _context.Cart.FindAsync(id);
-            if (cartItem != null)
-            {
-                _context.Cart.Remove(cartItem);
-                await _context.SaveChangesAsync();
-            }
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            var cartItem = await _context.Cart
+                .FirstOrDefaultAsync(c => c.CartID == id && (c.PersonID == userId || User.IsInRole("Administrator")));
+
+            if (cartItem == null)
+                return Forbid();
+
+            _context.Cart.Remove(cartItem);
+            await _context.SaveChangesAsync();
 
             return RedirectToAction(nameof(Index));
         }
@@ -197,7 +194,7 @@ namespace Cvjecara_Latica.Controllers
 
             // Provjeri postoji li već isti proizvod u korpi korisnika
             var existingCartItem = _context.Cart
-                .FirstOrDefault(c => c.ProductID == productId && c.PersonID == userId);
+                .FirstOrDefault(c => c.ProductID == productId && (c.PersonID == userId || User.IsInRole("Administrator")));
 
             if (existingCartItem != null)
             {
@@ -231,74 +228,87 @@ namespace Cvjecara_Latica.Controllers
             double total = cartItems.Sum(item => item.Product.Price * (item.ProductQuantity ?? 1));
             ViewBag.Total = total;
 
-            // Spremi kodove popusta korisnika (ako je registriran)
-            var discounts = _context.Discounts
-                .Where(d => d.PersonID == userId && !d.IsUsed && d.DiscountBegins <= DateTime.Now)
-                .ToList();
-
-            ViewBag.Discounts = discounts;
-
             return View();
         }
 
         // POST: Carts/SubmitOrder
         [HttpPost]
-        public async Task<IActionResult> SubmitOrder(string name, string discount, string city, string address, string phone, string applyDiscount)
+        
+        public async Task<IActionResult> SubmitOrder(string name, string city, string address, string phone, DateTime deliveryDate, string discountCode)
         {
             var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-            var cartItems = _context.Cart.Include(c => c.Product).Where(c => c.PersonID == userId).ToList();
+            var cartItems = _context.Cart
+                .Include(c => c.Product)
+                .Where(c => c.PersonID == userId)
+                .ToList();
 
             double total = cartItems.Sum(item => item.Product.Price * (item.ProductQuantity ?? 1));
             double originalTotal = total;
-            double discountedTotal = total;
 
-            // Ako je kliknuto "Apply" za popust kod
-            if (!string.IsNullOrEmpty(applyDiscount))
+            // Validacija datuma isporuke
+            if (deliveryDate < DateTime.Today.AddDays(2) ||
+                deliveryDate.Hour < 9 ||
+                deliveryDate.Hour >= 17)
             {
-                if (!string.IsNullOrEmpty(discount))
+                ModelState.AddModelError("deliveryDate", "Delivery must be at least 2 days from today, between 09:00 and 17:00.");
+                ViewBag.Total = total;
+                return View("PlaceOrder");
+            }
+
+            // Obrada promo koda
+            if (!string.IsNullOrWhiteSpace(discountCode))
+            {
+                var discount = _context.Discounts.FirstOrDefault(d =>
+                    d.DiscountCode == discountCode &&
+                    !d.IsUsed &&
+                    //d.DiscountBegins <= DateTime.Now &&
+                     d.PersonID == userId);
+
+                if (discount != null)
                 {
-                    var validDiscount = _context.Discounts
-                        .FirstOrDefault(d => d.DiscountCode == discount && d.PersonID == userId && !d.IsUsed && d.DiscountBegins <= DateTime.Now);
-
-                    if (validDiscount != null)
+                    if (discount.DiscountType == DiscountType.PercentageOff)
                     {
-                        if (validDiscount.DiscountType == DiscountType.PercentageOff)
-                            discountedTotal = total - (total * validDiscount.DiscountAmount / 100);
-                        else if (validDiscount.DiscountType == DiscountType.AmountOff)
-                            discountedTotal = total - validDiscount.DiscountAmount;
-
-                        // Ažuriraj popust kod u ViewBag za prikaz na stranici
-                        ViewBag.AppliedCode = discount;
-                        ViewBag.DiscountedTotal = discountedTotal;
-
-                        // Označi popust kao iskorišten
-                        validDiscount.IsUsed = true;
-                        _context.Discounts.Update(validDiscount);
-                        await _context.SaveChangesAsync();
+                        total -= total * discount.DiscountAmount / 100;
                     }
-                    else
+                    else // AmountOff
                     {
-                        ViewBag.Error = "Invalid or expired discount code.";
+                        total -= discount.DiscountAmount;
                     }
+
+                    if (total < 0)
+                        total = 0;
+
+                    // Oznaka da je iskorišten
+                    discount.IsUsed = true;
+                    _context.SaveChanges();
+                    TempData["DiscountApplied"] = true;
+                    TempData["OriginalTotal"] = originalTotal;
+                    TempData["SavedAmount"] = originalTotal - total;
+
+                    TempData["DiscountMessage"] = $"Promo code successfully applied! You saved\" {(originalTotal - total):F2} USD.";
+                }
+                else
+                {
+                    TempData["DiscountApplied"] = false;
+                    TempData["DiscountMessage"] = "The entered promo code is not valid or has already been used.";
                 }
             }
 
-            // Pošaljite korisniku na potvrdu narudžbe s novim informacijama
-            ViewBag.Total = originalTotal;
+            // Slanje podataka na stranicu za potvrdu narudžbe
+            ViewBag.Total = total;
             ViewBag.Name = name;
             ViewBag.City = city;
             ViewBag.Address = address;
             ViewBag.Phone = phone;
+            ViewBag.DeliveryDate = deliveryDate;
+            ViewBag.DiscountCode = discountCode;
 
-            // Ispisujemo ukupnu cijenu (s popustom ili bez njega)
-            ViewBag.DiscountedTotal = discountedTotal;
-
-            // Prikazivanje stranice za potvrdu narudžbe
             return View("ConfirmOrder");
         }
 
         // GET: Carts/ConfirmOrder
-        public IActionResult ConfirmOrder(string name, string discount, string city, string address, string phone)
+        // GET: Carts/ConfirmOrder
+        public IActionResult ConfirmOrder(string name, string city, string address, string phone)
         {
             var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
@@ -308,56 +318,8 @@ namespace Cvjecara_Latica.Controllers
                 .ToList();
 
             double total = cartItems.Sum(item => item.Product.Price * (item.ProductQuantity ?? 1));
-            double discountedTotal = total;
 
-            // Ako je popust kod uneseno na stranici za potvrdu
-            if (!string.IsNullOrEmpty(discount))
-            {
-                var discountEntity = _context.Discounts
-                    .FirstOrDefault(d =>
-                        d.DiscountCode == discount &&
-                        d.DiscountBegins <= DateTime.Now &&
-                        !d.IsUsed &&
-                        d.PersonID == userId);
-
-                if (discountEntity != null && discountEntity.DiscountAmount > 0)
-                {
-                    // Primijeni popust
-                    discountedTotal = discountEntity.DiscountType == DiscountType.PercentageOff
-                        ? total - (total * discountEntity.DiscountAmount / 100)
-                        : total - discountEntity.DiscountAmount;
-
-                    // Označi popust kao iskorišten
-                    discountEntity.IsUsed = true;
-                    _context.SaveChanges();
-
-                    // Postavi info za prikaz
-                    ViewBag.AppliedCode = discount;
-                    ViewBag.Total = total;
-                    ViewBag.DiscountedTotal = discountedTotal;
-                    ViewBag.Name = name;
-                    ViewBag.City = city;
-                    ViewBag.Address = address;
-                    ViewBag.Phone = phone;
-
-                    return View("ConfirmOrder");
-                }
-                else
-                {
-                    ViewBag.Error = "The discount code is invalid or already used.";
-                    ViewBag.Total = total;
-                    ViewBag.Name = name;
-                    ViewBag.City = city;
-                    ViewBag.Address = address;
-                    ViewBag.Phone = phone;
-
-                    return View("PlaceOrder");
-                }
-            }
-
-            // Ako nema koda uopšte
             ViewBag.Total = total;
-            ViewBag.DiscountedTotal = discountedTotal;
             ViewBag.Name = name;
             ViewBag.City = city;
             ViewBag.Address = address;
@@ -366,8 +328,139 @@ namespace Cvjecara_Latica.Controllers
             return View("ConfirmOrder");
         }
 
+        [HttpPost]
+        public async Task<IActionResult> SubmitOrderFinal(
+     string name,
+     string city,
+     string address,
+     string phone,
+     string paymentTypeString,
+     double total,
+     string? BankAccount,
+     DateTime deliveryDate)
+        {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            var cartItems = _context.Cart
+                .Include(c => c.Product)
+                .Where(c => c.PersonID == userId)
+                .ToList();
+
+            if (!cartItems.Any())
+            {
+                ViewBag.Error = "Your cart is empty.";
+                return RedirectToAction("Index");
+            }
+
+            if (paymentTypeString == "Card" && string.IsNullOrWhiteSpace(BankAccount))
+            {
+                ModelState.AddModelError("BankAccount", "Card number is required when paying by card.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Name = name;
+                ViewBag.City = city;
+                ViewBag.Address = address;
+                ViewBag.Phone = phone;
+                ViewBag.DeliveryDate = deliveryDate;
+                ViewBag.Total = total;
+                return View("ConfirmOrder", new Payment());
+            }
+
+            // Konverzija stringa u enum
+            var selectedPaymentType = paymentTypeString == "Delivery"
+                ? Cvjecara_Latica.Models.PaymentType.Cash
+                : Cvjecara_Latica.Models.PaymentType.CreditCard;
+
+            var payment = new Payment
+            {
+                DeliveryAddress = address,
+                PayedAmount = total,
+                PaymentType = selectedPaymentType,
+                BankAccount = BankAccount?.ToString()
+            };
+
+            _context.Payments.Add(payment);
+            await _context.SaveChangesAsync();
 
 
+            var order = new Order
+            {
+                PersonID = userId,
+                purchaseDate = DateTime.Now,
+                TotalAmountToPay = total,
+                IsOrderSent = false,
+                DeliveryDate = deliveryDate,
+                PaymentID = payment.PaymentID
+            };
+
+            _context.Orders.Add(order);
+
+            var user = await _context.Users.FindAsync(userId);
+            if (user != null)
+            {
+                var productDetails = string.Join("<br/>", cartItems.Select(ci =>
+                    $"- {ci.Product.Name} x {ci.ProductQuantity} = {ci.Product.Price * ci.ProductQuantity} USD"));
+
+                var emailBody = $@"
+            <h3>Order Confirmation</h3>
+            <p><strong>Name:</strong> {name}</p>
+            <p><strong>City:</strong> {city}</p>
+            <p><strong>Address:</strong> {address}</p>
+            <p><strong>Phone:</strong> {phone}</p>
+            <p><strong>Delivery Date:</strong>{deliveryDate}</p>
+            <p><strong>Payment Method:</strong> {(selectedPaymentType == PaymentType.CreditCard ? "Credit Card" : "Cash on Delivery")}</p>
+            <p><strong>Total Amount:</strong> {total} USD</p>
+            <p><strong>Products:</strong><br/>{productDetails}</p>";
+
+                await _emailService.SendEmailAsync(user.Email, "Your order was successful", emailBody);
+            }
+
+            _context.Cart.RemoveRange(cartItems);
+            await _context.SaveChangesAsync();
+
+            foreach (var item in cartItems)
+            {
+                var productOrder = new ProductOrder
+                {
+                    OrderID = order.OrderID,
+                    ProductID = item.ProductID,
+                    ProductQuantity = item.ProductQuantity ?? 1
+                };
+                _context.ProductOrders.Add(productOrder);
+            }
+            await _context.SaveChangesAsync(); // Snima ProductOrders
+            ViewBag.OrderId = order.OrderID;
+            return View("OrderSuccess");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SubmitRating(int orderId, double rating)
+        {
+            if (rating < 1 || rating > 5)
+            {
+                TempData["RatingError"] = "Invalid rating value.";
+                return RedirectToAction("OrderSuccess");
+            }
+
+            var order = await _context.Orders.FindAsync(orderId);
+            if (order == null)
+            {
+                return NotFound();
+            }
+
+            order.Rating = rating;
+            await _context.SaveChangesAsync();
+
+
+            return View("~/Views/Home/FinishRating.cshtml");
+        }
+        public IActionResult FinishRating()
+        {
+            return View();
+        }
     }
-
 }
+
+

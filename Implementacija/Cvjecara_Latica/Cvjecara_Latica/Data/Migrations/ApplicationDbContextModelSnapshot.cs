@@ -97,6 +97,9 @@ namespace Cvjecara_Latica.Data.Migrations
                     b.Property<bool>("IsOrderSent")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsPickedUp")
+                        .HasColumnType("bit");
+
                     b.Property<int>("PaymentID")
                         .HasColumnType("int");
 
@@ -130,8 +133,8 @@ namespace Cvjecara_Latica.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PaymentID"));
 
-                    b.Property<int?>("BankAccount")
-                        .HasColumnType("int");
+                    b.Property<string>("BankAccount")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("DeliveryAddress")
                         .IsRequired()
@@ -346,6 +349,10 @@ namespace Cvjecara_Latica.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ReportID"));
 
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("Date")
                         .HasColumnType("datetime2");
 
@@ -443,12 +450,10 @@ namespace Cvjecara_Latica.Data.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderKey")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
@@ -485,12 +490,10 @@ namespace Cvjecara_Latica.Data.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");

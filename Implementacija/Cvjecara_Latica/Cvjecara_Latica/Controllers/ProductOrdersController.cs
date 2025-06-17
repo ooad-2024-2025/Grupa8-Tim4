@@ -1,15 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Cvjecara_Latica.Data;
+using Cvjecara_Latica.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Cvjecara_Latica.Data;
-using Cvjecara_Latica.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Cvjecara_Latica.Controllers
 {
+    [Authorize]
+
     public class ProductOrdersController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -20,6 +23,7 @@ namespace Cvjecara_Latica.Controllers
         }
 
         // GET: ProductOrders
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.ProductOrders.Include(p => p.Order).Include(p => p.Product);
@@ -27,6 +31,7 @@ namespace Cvjecara_Latica.Controllers
         }
 
         // GET: ProductOrders/Details/5
+        [AllowAnonymous]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -47,6 +52,7 @@ namespace Cvjecara_Latica.Controllers
         }
 
         // GET: ProductOrders/Create
+        [Authorize(Roles = "Administrator")]
         public IActionResult Create()
         {
             ViewData["OrderID"] = new SelectList(_context.Orders, "OrderID", "OrderID");
@@ -57,6 +63,8 @@ namespace Cvjecara_Latica.Controllers
         // POST: ProductOrders/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
+        [Authorize(Roles = "Administrator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ProductOrderID,OrderID,ProductID,ProductQuantity")] ProductOrder productOrder)
@@ -73,6 +81,7 @@ namespace Cvjecara_Latica.Controllers
         }
 
         // GET: ProductOrders/Edit/5
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -93,6 +102,7 @@ namespace Cvjecara_Latica.Controllers
         // POST: ProductOrders/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [Authorize(Roles = "Administrator")]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("ProductOrderID,OrderID,ProductID,ProductQuantity")] ProductOrder productOrder)
@@ -128,6 +138,7 @@ namespace Cvjecara_Latica.Controllers
         }
 
         // GET: ProductOrders/Delete/5
+        [Authorize(Roles = "Administrator")]
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -148,6 +159,7 @@ namespace Cvjecara_Latica.Controllers
         }
 
         // POST: ProductOrders/Delete/5
+        [Authorize(Roles = "Administrator")]
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

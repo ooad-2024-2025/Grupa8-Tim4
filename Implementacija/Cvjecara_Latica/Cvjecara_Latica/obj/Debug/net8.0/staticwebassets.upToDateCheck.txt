@@ -1,5 +1,6 @@
 wwwroot\css\site.css
 wwwroot\favicon.ico
+wwwroot\images\mastercard.jpg
 wwwroot\images\rosebox1.jpg
 wwwroot\images\rosebox2.jpg
 wwwroot\images\rosebox3.jpg

@@ -1,71 +1,69 @@
 ﻿@model IEnumerable<Cvjecara_Latica.Models.Order>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Orders";
 }
 
-<h1>Index</h1>
+<h1>
+    @if (User.IsInRole("Administrator"))
+    {
+        <text>All Orders</text>
+    }
+    else
+    {
+        <text>My Orders</text>
+    }
+</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
 <table class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Payment)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Person)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.purchaseDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IsOrderSent)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Rating)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.TotalAmountToPay)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.DeliveryDate)
-            </th>
+            <th>@Html.DisplayNameFor(model => model.Payment)</th>
+            <th>@Html.DisplayNameFor(model => model.Person)</th>
+            <th>@Html.DisplayNameFor(model => model.purchaseDate)</th>
+            <th>@Html.DisplayNameFor(model => model.IsOrderSent)</th>
+            <th>@Html.DisplayNameFor(model => model.Rating)</th>
+            <th>@Html.DisplayNameFor(model => model.TotalAmountToPay)</th>
+            <th>@Html.DisplayNameFor(model => model.DeliveryDate)</th>
+            <th>@Html.DisplayNameFor(model => model.IsPickedUp)</th>
+
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Payment.PaymentID)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Person.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.purchaseDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IsOrderSent)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Rating)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.TotalAmountToPay)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.DeliveryDate)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.OrderID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.OrderID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.OrderID">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.Payment.PaymentID)</td>
+                <td>@Html.DisplayFor(modelItem => item.Person.Id)</td>
+                <td>@Html.DisplayFor(modelItem => item.purchaseDate)</td>
+                <td>@Html.DisplayFor(modelItem => item.IsOrderSent)</td>
+                <td>@Html.DisplayFor(modelItem => item.Rating)</td>
+                <td>@Html.DisplayFor(modelItem => item.TotalAmountToPay)</td>
+                <td>@Html.DisplayFor(modelItem => item.DeliveryDate)</td>
+                <td>@Html.DisplayFor(modelItem => item.IsPickedUp)</td>
+                <td>
+                    @if (User.IsInRole("Administrator"))
+                    {
+                <a asp-action="Edit" asp-route-id="@item.OrderID">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@item.OrderID">Delete</a>
+                                    }
+                    <a asp-action="Details" asp-route-id="@item.OrderID">Details</a>
+                    @* Dugme za označavanje kao preuzeto (samo ako nije već) *@
+                    @if (!item.IsPickedUp && User.IsInRole("Administrator"))
+                    {
+                        <form asp-action="MarkAsPickedUp" asp-route-id="@item.OrderID" method="post" style="display:inline">
+                            <button type="submit" class="btn btn-success btn-sm" onclick="return confirm('Are you sure you want to mark this order as picked up?');">
+                                Mark as Picked Up
+                            </button>
+                        </form>
+                    }
+                    else if (item.IsPickedUp)
+                    {
+                        <span class="text-muted">Picked up</span>
+                    }
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

@@ -1,41 +1,42 @@
 ﻿@model IEnumerable<Cvjecara_Latica.Models.ProductSale>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Product Sales";
 }
 
-<h1>Index</h1>
+<h1>Product Sales</h1>
 
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
+@if (User.IsInRole("Administrator"))
+{
+    <p>
+        <a asp-action="Create" class="btn btn-primary">Create New</a>
+    </p>
+}
+
 <table class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.SalesDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Product)
-            </th>
+            <th>@Html.DisplayNameFor(model => model.SalesDate)</th>
+            <th>@Html.DisplayNameFor(model => model.Product)</th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.SalesDate)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Product.ProductID)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ProductSalesID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ProductSalesID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ProductSalesID">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.SalesDate)</td>
+                <td>@Html.DisplayFor(modelItem => item.Product.ProductID)</td>
+                <td>
+                    @if (User.IsInRole("Administrator"))
+                    {
+                <a asp-action="Edit" asp-route-id="@item.ProductSalesID">Edit</a>
+                                
+                                < a asp - action = "Delete" asp - route - id = "@item.ProductSalesID" > Delete </ a > 
+                                    }
+                    <a asp-action="Details" asp-route-id="@item.ProductSalesID">Details</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>

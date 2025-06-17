@@ -1,47 +1,42 @@
 ﻿@model IEnumerable<Cvjecara_Latica.Models.Report>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Reports";
 }
 
-<h1>Index</h1>
+<h1>Reports</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" class="btn btn-success">Create Report</a>
 </p>
+
 <table class="table">
     <thead>
         <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.ReportType)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Date)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Person)
-            </th>
-            <th></th>
+            <th>@Html.DisplayNameFor(model => model.ReportType)</th>
+            <th>@Html.DisplayNameFor(model => model.Date)</th>
+            <th>Content</th> <!-- Dodaj novu kolonu za sadržaj -->
+            <th>Actions</th> <!-- Posebna kolona za linkove -->
         </tr>
     </thead>
+
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.ReportType)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Date)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Person.Id)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.ReportID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ReportID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ReportID">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@Html.DisplayFor(modelItem => item.ReportType)</td>
+                <td>@item.Date.ToString("dd.MM.yyyy")</td>
+                <td>@item.Content</td> <!-- OVDJE SE PRIKAZUJE SADRŽAJ -->
+                <td>
+                    @if (User.IsInRole("Administrator"))
+                    {
+                        <a asp-action="Details" asp-route-id="@item.ReportID">Details</a>
+                        <a asp-action="Edit" asp-route-id="@item.ReportID">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@item.ReportID">Delete</a>
+                    }
+                </td>
+            </tr>
+        }
+
     </tbody>
 </table>

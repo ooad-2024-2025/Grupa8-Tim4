@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/Cvjecara_Latica.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    
     @section Scripts {
         <partial name="_ValidationScriptsPartial" />
     }
@@ -19,7 +20,19 @@
             <div class="nav-container">
                 <!-- Lijeva strana -->
                 <div class="nav-left">
-                    <partial name="_LoginPartial" />
+                    @using Microsoft.AspNetCore.Identity
+                    @inject SignInManager<Person> SignInManager
+                    @inject UserManager<Person> UserManager
+
+                    @if (SignInManager.IsSignedIn(User))
+                    {
+                        <form asp-controller="Home" asp-action="Logout" method="post" class="form-inline">
+                            @Html.AntiForgeryToken()
+                            <button type="submit" class="btn btn-link color: #661a13">Logout</button>
+                            <span class="color: #661a13">Hello, <strong>@User.Identity?.Name</strong>!</span>
+                        </form>
+                    }
+                   
                 </div>
                     <div class="nav-right">
                         <a href="/Home/Contact" class="nav-link">Contact</a>
@@ -28,7 +41,7 @@
                         <a href="/Home/Search" class="nav-icon"><i class="fas fa-search"></i></a>
                         <a href="/Home/Login" class="nav-icon"><i class="fas fa-user"></i></a>
                         <a href="/Carts/Index" class="nav-icon"><i class="fas fa-shopping-cart"></i></a>
-
+                   
                     </div>
                 </div>
             </nav>

@@ -40,6 +40,7 @@ namespace Cvjecara_Latica.Controllers
         {
             return View();
         }
+        [HttpGet]
         public IActionResult Login()
         {
             return View();
@@ -48,6 +49,12 @@ namespace Cvjecara_Latica.Controllers
         [HttpPost]
         public async Task<IActionResult> Login(string email, string password)
         {
+            if (string.IsNullOrEmpty(email))
+            {
+                ViewBag.Message = "Email is required.";
+                return View();
+            }
+
             var user = await _userManager.FindByEmailAsync(email);
 
             if (user == null)
@@ -61,6 +68,7 @@ namespace Cvjecara_Latica.Controllers
                 ViewBag.Message = "Please verify your email address before logging in.";
                 return View();
             }
+
             var result = await _signInManager.PasswordSignInAsync(email, password, false, false);
 
             if (result.Succeeded)
@@ -71,7 +79,7 @@ namespace Cvjecara_Latica.Controllers
             ViewBag.Message = "Invalid login attempt.";
             return View();
         }
-        //dovde
+
         public IActionResult Register()
         {
             return View();
@@ -148,8 +156,27 @@ namespace Cvjecara_Latica.Controllers
                         "Email Verification Code",
                         $"<p>Your verification code is: <strong>{code}</strong></p>"
                     );
+                    // --- Dodaj odmah nakon slanja verifikacijskog koda ---
+                    var newDiscount = new Discount
+                    {
+                        DiscountCode = GenerateDiscountCode(),
+                        DiscountAmount = 10,
+                        DiscountType = DiscountType.PercentageOff,
+                        DiscountBegins = DateTime.Now,
+                        PersonID = user.Id
+                    };
+
+                    _context.Discounts.Add(newDiscount);
+                    await _context.SaveChangesAsync();
+
+                    await _emailService.SendEmailAsync(
+                        user.Email,
+                        "Welcome! Your promo code",
+                        $"<p>Thank you for registering! Your promo code for a 10% discount is: <strong>{newDiscount.DiscountCode}</strong></p>"
+                    );
 
                     return RedirectToAction("VerifyCode");
+
                 }
 
                 foreach (var error in result.Errors)
@@ -160,6 +187,17 @@ namespace Cvjecara_Latica.Controllers
 
             return View(model);
         }
+        private string GenerateDiscountCode()
+        {
+            return $"PROMO-{Guid.NewGuid().ToString().Substring(0, 8).ToUpper()}";
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Logout()
+        {
+            await _signInManager.SignOutAsync();
+            return RedirectToAction("Index", "Home");
+        }
         [HttpGet]
         public IActionResult VerifyCode()
         {
@@ -167,7 +205,7 @@ namespace Cvjecara_Latica.Controllers
             TempData.Keep("UserEmail");
             TempData.Keep("CodeGeneratedAt"); 
             return View();
-            return View();
+            
         }
 
         [HttpPost]
@@ -205,26 +243,6 @@ namespace Cvjecara_Latica.Controllers
                     user.EmailConfirmed = true;
                     await _userManager.UpdateAsync(user);
                 }
-
-                // Dodaj popust korisniku nakon verifikacije
-                var discount = new Discount
-                {
-                    DiscountCode = Guid.NewGuid().ToString().Substring(0, 8).ToUpper(),
-                    DiscountAmount = 10,
-                    DiscountType = DiscountType.PercentageOff,
-                    DiscountBegins = DateTime.Now,
-                    PersonID = user.Id,
-                    IsUsed = false
-                };
-
-                _context.Discounts.Add(discount);
-                await _context.SaveChangesAsync();
-
-                // Pošalji kod korisniku na email
-                await _emailService.SendEmailAsync(user.Email,
-                    "Welcome! Here's your 10% discount code",
-                    $"<p>Thank you for verifying your email. Use this code at checkout to get 10% off: <strong>{discount.DiscountCode}</strong></p>");
-
 
                 return View("VerificationSuccess");
             }
@@ -323,12 +341,12 @@ namespace Cvjecara_Latica.Controllers
                     var range = price.Split('-');
                     if (range.Length == 2 &&
                         int.TryParse(range[0].Trim(), out int min) &&
-                        int.TryParse(range[1].Replace("BAM", "").Trim(), out int max))
+                        int.TryParse(range[1].Replace("USD", "").Trim(), out int max))
                     {
                         products = products.Where(p => p.Price >= min && p.Price <= max);
                     }
                 }
-                else if (int.TryParse(price.Replace("BAM", "").Trim(), out int exact))
+                else if (int.TryParse(price.Replace("USD", "").Trim(), out int exact))
                 {
                     products = products.Where(p => p.Price == exact);
                 }
@@ -342,16 +360,14 @@ namespace Cvjecara_Latica.Controllers
 
             return View(products.ToList());
         }
-
-
         public IActionResult BestSellers()
         {
             var bestSellers = _context.Products.Where(p => p.IsBestSeller).ToList();
             return View(bestSellers);
         }
-
-
-
-
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
     }
 }

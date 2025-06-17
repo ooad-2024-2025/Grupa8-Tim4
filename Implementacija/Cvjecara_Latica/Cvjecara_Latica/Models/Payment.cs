@@ -30,8 +30,7 @@ namespace Cvjecara_Latica.Models
 
         [DisplayName("Card number")]
         [RegularExpression(@"^\d{13,16}$", ErrorMessage = "Card number must contain between 13 and 16 digits.")]
-        public int? BankAccount { get; set; }
-
+        public string? BankAccount { get; set; }
         public Payment()
         {
 
