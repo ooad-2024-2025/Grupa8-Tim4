@@ -273,3 +273,4 @@ C:\Users\nejra\Documents\GitHub\Grupa8-Tim4\Implementacija\Cvjecara_Latica\Cvjec
 C:\Users\nejra\Documents\GitHub\Grupa8-Tim4\Implementacija\Cvjecara_Latica\Cvjecara_Latica\bin\Debug\net8.0\runtimes\win-arm64\native\libSkiaSharp.dll
 C:\Users\nejra\Documents\GitHub\Grupa8-Tim4\Implementacija\Cvjecara_Latica\Cvjecara_Latica\bin\Debug\net8.0\runtimes\win-x64\native\libSkiaSharp.dll
 C:\Users\nejra\Documents\GitHub\Grupa8-Tim4\Implementacija\Cvjecara_Latica\Cvjecara_Latica\bin\Debug\net8.0\runtimes\win-x86\native\libSkiaSharp.dll
+C:\Users\nejra\Documents\GitHub\Grupa8-Tim4\Implementacija\Cvjecara_Latica\Cvjecara_Latica\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
